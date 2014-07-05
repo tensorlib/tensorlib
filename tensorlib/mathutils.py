@@ -6,10 +6,27 @@ import numpy as np
 
 
 def kr(B, C):
-    """Calculate the Khatri-Rao product of 2D matrices."""
-    assert(len(B.shape) == len(C.shape) == 2)
-    assert(B.shape[-1] == C.shape[-1])
-    A = np.zeros((B.shape[0] * C.shape[0], B.shape[-1]))
+    """Calculate the Khatri-Rao product of 2D matrices. Assumes blocks to
+    be the columns of both matrices. 
+    See http://en.wikipedia.org/wiki/Kronecker_product#Khatri-Rao_product
+
+    Parameters
+    ==========
+
+    B: ndarray, shape=(n, p)
+    C: ndarray, shape=(m, p)
+"""
+
+    if B.ndim != 2 or C.ndim != 2:
+        raise ValueError("B and C must have 2 dimensions")
+
+    n, p = B.shape
+    m, pC = C.shape
+
+    if p != pC:
+        raise ValueError("B and C must have the same number of columns")
+
+    A = np.zeros((n * m, p))
     for k in range(B.shape[-1]):
-        print(np.kron(C[:, k], B[:, k]))
+        A[:, k] = np.kron(C[:, k], B[:, k])
     return A

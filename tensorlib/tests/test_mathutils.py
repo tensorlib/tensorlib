@@ -1,19 +1,21 @@
 import numpy as np
 from numpy.testing import assert_array_almost_equal
-from tensorlib.mathutils import kr, _kr_einsum
+from tensorlib.mathutils import kr, _kr_einsum, _kr_npdot
 
 
-# def test_kr():
-#     """Test correctness of Khatri-Rao product using wikipedia example."""
-#     B = np.arange(1, 10, 1).reshape(3, 3)
-#     C = np.arange(1, 10, 1).reshape(3, 3).T
-#     right_answer = np.array([[1, 2, 12, 21],
-#                              [4, 5, 24, 42],
-#                              [14, 16, 45, 72],
-#                              [21, 24, 54, 81]])
-#     A = kr(B, C)
-#     print(A)
-#     assert_array_almost_equal(A, right_answer)
+def test_kr():
+    """Test correctness of Khatri-Rao product"""
+
+    B = np.eye(3)
+    C = np.arange(12).reshape(3, 4).T
+
+    A = kr(B, C)
+
+    expected_result = np.array([[0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0],
+                                [0, 0, 0, 0, 4, 5, 6, 7, 0, 0, 0, 0],
+                                [0, 0, 0, 0, 0, 0, 0, 0, 8, 9, 10, 11]]).T
+
+    assert_array_almost_equal(A, expected_result)
 
 
 def test_kr_einsum_kr_equiv():

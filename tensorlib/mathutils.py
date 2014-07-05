@@ -28,5 +28,12 @@ def kr(B, C):
 
     A = np.zeros((n * m, p))
     for k in range(B.shape[-1]):
-        A[:, k] = np.kron(C[:, k], B[:, k])
+        A[:, k] = np.kron(B[:, k], C[:, k])
     return A
+
+
+def _kr_einsum(B, C):
+
+    n, p = B.shape
+    m, pC = C.shape
+    return np.einsum('ij, kj -> ikj', B, C).reshape(m * n, p)

@@ -10,7 +10,7 @@ def test_cp():
     http://issnla2010.ba.cnr.it/DecompositionsI.pdf
     """
     rs = np.random.RandomState(999)
-    X = rs.randn(3, 2, 4)
+    X = rs.randn(3, 5, 4)
     assert_raises(ValueError, cp, X)
     A1, B1, C1 = cp(X, 2, random_state=1999)
     A2, B2, C2 = cp(X, 2, random_state=1999, force_general=True)

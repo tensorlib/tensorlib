@@ -57,28 +57,27 @@ def _cpN(X, n_components, tol, max_iter, random_state=None):
                   for i in range(len(X.shape))]
 
     SSE = 1E10
-    SST = np.sum(X ** 2)
     itr = 0
 
     while True:
         itr += 1
         SSE_old = SSE
 
-        # Symmetry here... could we exploit to make calculation faster?
+        # Symmetry here... could we exploit make calculation faster?
         grams = [np.dot(arr.T, arr) for arr in components]
 
-        updates = []
+        updates = components
         normalizations = []
         for idx in range(len(components)):
             components_sublist = [components[n] for n in range(len(components))
                                   if n != idx]
             grams_sublist = [grams[n] for n in range(len(components))
                              if n != idx]
-            p1 = reduce(kr, components_sublist[1:], components_sublist[0])
+            p1 = reduce(kr, components_sublist[:-1][::-1], components_sublist[-1])
             p2 = linalg.pinv(reduce(np.multiply, grams_sublist, 1.))
             res = np.dot(matricize(X, -idx - 1), p1)
-            updates.append(np.dot(res, p2))
-            t = np.sqrt(np.sum(updates[-1] ** 2, axis=0))
+            updates[idx] = np.dot(res, p2)
+            t = np.sqrt(np.sum(updates[idx] ** 2, axis=0))
             normalizations.append(t)
 
         # Normalization
@@ -88,12 +87,11 @@ def _cpN(X, n_components, tol, max_iter, random_state=None):
                    for n, u in enumerate(updates)]
 
         SSE = np.sum(p2 * np.dot(updates[-1].T, updates[-1])) - 2 * np.sum(
-            res * updates[-1]) + SST
+            res * updates[-1]) + np.sum(X ** 2)
         thresh = np.abs(SSE - SSE_old) / SSE_old
         if (thresh < tol) or (itr > max_iter):
             break
-        components = updates
-    return components
+    return updates
 
 
 def cp(X, n_components=None, tol=1., max_iter=100, random_state=None,

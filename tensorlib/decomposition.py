@@ -23,7 +23,6 @@ def _cp3(X, n_components, tol, max_iter, random_state=None):
         itr += 1
         SSE_old = SSE
 
-        # Symmetry here... could we exploit make calculation faster?
         ATA = np.dot(A.T, A)
         BTB = np.dot(B.T, B)
         CTC = np.dot(C.T, C)
@@ -43,8 +42,8 @@ def _cp3(X, n_components, tol, max_iter, random_state=None):
         C = np.dot(C, np.diag(1. / C_norm)).dot(scale)
 
         SSE = linalg.norm(matricize(X, 2) - np.dot(A, kr(C, B).T)) ** 2
-        thresh = np.abs(SSE - SSE_old) / SSE_old
-        if (thresh < tol) or (itr > max_iter):
+        thresh = (SSE - SSE_old) / SSE_old
+        if np.abs(thresh < tol) or (itr > max_iter):
             break
     return A, B, C
 
@@ -63,7 +62,6 @@ def _cpN(X, n_components, tol, max_iter, random_state=None):
         itr += 1
         SSE_old = SSE
 
-        # Symmetry here... could we exploit make calculation faster?
         grams = [np.dot(arr.T, arr) for arr in components]
 
         updates = components
@@ -88,13 +86,13 @@ def _cpN(X, n_components, tol, max_iter, random_state=None):
 
         SSE = np.sum(p2 * np.dot(updates[-1].T, updates[-1])) - 2 * np.sum(
             res * updates[-1]) + np.sum(X ** 2)
-        thresh = np.abs(SSE - SSE_old) / SSE_old
-        if (thresh < tol) or (itr > max_iter):
+        thresh = (SSE - SSE_old) / SSE_old
+        if np.abs(thresh < tol) or (itr > max_iter):
             break
     return updates
 
 
-def cp(X, n_components=None, tol=1., max_iter=100, random_state=None,
+def cp(X, n_components=None, tol=1E-6, max_iter=1000, random_state=None,
        force_general=False):
     if n_components is None:
         raise ValueError("n_components is a required argument!")

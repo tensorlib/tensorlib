@@ -6,7 +6,7 @@ from .mathutils import kr, matricize
 from .utils import check_random_state, check_tensor
 
 
-def _cp3(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
+def _cp3(X, n_components, tol, max_iter, random_state=None):
     """3 dimensional CANDECOMP/PARFAC decomposition."""
     if len(X.shape) != 3:
         raise ValueError("CP3 decomposition only supports 3 dimensions!")
@@ -16,11 +16,10 @@ def _cp3(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
     B = rs.randn(X.shape[1], n_components)
     C = rs.randn(X.shape[2], n_components)
 
-    SSE = 1E100
-    dSSE = 1E100
+    SSE = 1E10
     itr = 0
 
-    while (dSSE >= tol * SSE) and (itr < max_iter):
+    while True:
         itr += 1
         SSE_old = SSE
 
@@ -33,24 +32,35 @@ def _cp3(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
         B = np.dot(matricize(X, 1), kr(C, A)).dot(linalg.pinv(ATA * CTC))
         C = np.dot(matricize(X, 0), kr(B, A)).dot(linalg.pinv(ATA * BTB))
 
+        # Normalization
+        A_norm = np.sqrt(np.sum(A ** 2, axis=0))
+        B_norm = np.sqrt(np.sum(B ** 2, axis=0))
+        C_norm = np.sqrt(np.sum(C ** 2, axis=0))
+        prod_norm = A_norm * B_norm * C_norm
+        scale = np.diag(prod_norm ** (1. / len(X.shape)))
+        A = np.dot(A, np.diag(1. / A_norm)).dot(scale)
+        B = np.dot(B, np.diag(1. / B_norm)).dot(scale)
+        C = np.dot(C, np.diag(1. / C_norm)).dot(scale)
+
         SSE = linalg.norm(matricize(X, 2) - np.dot(A, kr(C, B).T)) ** 2
-        dSSE = SSE_old - SSE
+        thresh = np.abs(SSE - SSE_old) / SSE_old
+        if (thresh < tol) or (itr > max_iter):
+            break
     return A, B, C
 
 
-def _cpN(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
+def _cpN(X, n_components, tol, max_iter, random_state=None):
     """Generalized CANDECOMP/PARFAC decomposition."""
 
     rs = check_random_state(random_state)
     components = [rs.randn(X.shape[i], n_components)
                   for i in range(len(X.shape))]
 
-    SSE = 1E100
-    dSSE = 1E100
+    SSE = 1E10
     SST = np.sum(X ** 2)
     itr = 0
 
-    while (dSSE >= tol * SSE) and (itr < max_iter):
+    while True:
         itr += 1
         SSE_old = SSE
 
@@ -58,6 +68,7 @@ def _cpN(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
         grams = [np.dot(arr.T, arr) for arr in components]
 
         updates = []
+        normalizations = []
         for idx in range(len(components)):
             components_sublist = [components[n] for n in range(len(components))
                                   if n != idx]
@@ -67,15 +78,25 @@ def _cpN(X, n_components, tol=1E-6, max_iter=1000, random_state=None):
             p2 = linalg.pinv(reduce(np.multiply, grams_sublist, 1.))
             res = np.dot(matricize(X, -idx - 1), p1)
             updates.append(np.dot(res, p2))
+            t = np.sqrt(np.sum(updates[-1] ** 2, axis=0))
+            normalizations.append(t)
+
+        # Normalization
+        prod_norm = reduce(np.multiply, normalizations[1:], normalizations[0])
+        scale = np.diag(prod_norm ** (1. / len(X.shape)))
+        updates = [np.dot(u, np.diag(1. / normalizations[n])).dot(scale)
+                   for n, u in enumerate(updates)]
 
         SSE = np.sum(p2 * np.dot(updates[-1].T, updates[-1])) - 2 * np.sum(
             res * updates[-1]) + SST
-        dSSE = SSE_old - SSE
+        thresh = np.abs(SSE - SSE_old) / SSE_old
+        if (thresh < tol) or (itr > max_iter):
+            break
         components = updates
     return components
 
 
-def cp(X, n_components=None, tol=1E-6, max_iter=1000, random_state=None,
+def cp(X, n_components=None, tol=1., max_iter=100, random_state=None,
        force_general=False):
     if n_components is None:
         raise ValueError("n_components is a required argument!")

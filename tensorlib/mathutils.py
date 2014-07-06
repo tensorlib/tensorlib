@@ -16,7 +16,6 @@ def kr(B, C):
 
     Parameters
     ----------
-
     B : ndarray, shape = [n, p]
     C : ndarray, shape = [m, p]
 
@@ -24,6 +23,7 @@ def kr(B, C):
     Returns
     -------
     A : ndarray, shape = [m * n, p]
+
     """
     if B.ndim != 2 or C.ndim != 2:
         raise ValueError("B and C must have 2 dimensions")
@@ -47,3 +47,24 @@ def _canonical_kr(B, C):
     for k in range(B.shape[-1]):
         A[:, k] = np.kron(B[:, k], C[:, k])
     return A
+
+
+def matricize(X, axis):
+    """
+    Returns flattened version of tensor.
+    See http://www.graphanalysis.org/SIAM-PP08/Dunlavy.pdf
+    for more details.
+
+    Parameters
+    ----------
+    X : ndarray, shape = [d1, ..., dn]
+
+
+    Returns
+    -------
+    X_flat : ndarray, shape = [d_axis, d1 * d2 * ... d_n]
+
+    """
+    dims = len(X.shape) - 1
+    index = dims - axis
+    return np.rollaxis(X, index).reshape(X.shape[index], -1)

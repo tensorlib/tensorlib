@@ -13,7 +13,7 @@ setuptools.setup(
     license='BSD 3-clause',
     url='http://github.com/kastnerkyle/tensorlib/',
     install_requires=['numpy',
-                      'scipy'],
+                      'scipy',],
     classifiers=['Development Status :: 3 - Alpha',
                  'Intended Audience :: Science/Research',
                  'License :: OSI Approved :: BSD License',

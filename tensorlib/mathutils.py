@@ -75,5 +75,8 @@ def matricize(X, axis):
 
     """
     dims = len(X.shape) - 1
+    # If negative axis is passed, convert to equivalent positive form
+    if axis < 0:
+        axis = dims + axis + 1
     index = dims - axis
     return np.rollaxis(X, index).reshape(X.shape[index], -1)

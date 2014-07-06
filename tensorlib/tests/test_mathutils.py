@@ -3,6 +3,7 @@ from numpy.testing import assert_array_almost_equal
 from tensorlib.mathutils import kr, _canonical_kr, _npdot_kr
 from tensorlib.mathutils import matricize
 
+
 def test_kr():
     """
     Test correctness of Khatri-Rao product. Data from
@@ -58,5 +59,8 @@ def test_matricize():
     X2 = np.rollaxis(X, 1).reshape(X.shape[1], -1)
     X3 = np.rollaxis(X, 0).reshape(X.shape[0], -1)
     assert_array_almost_equal(X1, matricize(X, 0))
+    assert_array_almost_equal(X1, matricize(X, -3))
     assert_array_almost_equal(X2, matricize(X, 1))
+    assert_array_almost_equal(X2, matricize(X, -2))
     assert_array_almost_equal(X3, matricize(X, 2))
+    assert_array_almost_equal(X3, matricize(X, -1))

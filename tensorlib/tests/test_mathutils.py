@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import assert_array_almost_equal
-from tensorlib.mathutils import kr, _canonical_kr
+from tensorlib.mathutils import kr, _canonical_kr, _npdot_kr
 from tensorlib.mathutils import matricize
 
 def test_kr():
@@ -32,6 +32,20 @@ def test_canonical_kr():
     A_canon = _canonical_kr(B, C)
 
     assert_array_almost_equal(A, A_canon)
+
+
+def test_npdot_kr():
+    """
+    Tests the equivalence of _npdot_kr and canonical kr
+    """
+    rng = np.random.RandomState(42)
+    B = rng.randn(2, 3)
+    C = rng.randn(4, 3)
+
+    A_canon = _canonical_kr(B, C)
+    A_npdot = _npdot_kr(B, C)
+
+    assert_array_almost_equal(A_canon, A_npdot)
 
 
 def test_matricize():

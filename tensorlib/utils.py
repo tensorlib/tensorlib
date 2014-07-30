@@ -4,13 +4,10 @@
 
 import numpy as np
 import numbers
-import os
 try:
     import urllib.request as urllib  # for backwards compatibility
 except ImportError:
     import urllib2 as urllib
-
-DATASETS_DIR = os.path.join(os.path.expanduser("~"), "tensorlib_data")
 
 
 def check_tensor(X):
@@ -36,7 +33,7 @@ def check_random_state(seed):
                      ' instance' % seed)
 
 
-def downloader(url, server_fname, local_fname=None, progress_update_every=5):
+def download(url, server_fname, local_fname=None, progress_update_every=5):
     """
     An internet download utility modified from
     http://stackoverflow.com/questions/22676/
@@ -45,10 +42,7 @@ def downloader(url, server_fname, local_fname=None, progress_update_every=5):
     u = urllib.urlopen(url)
     if local_fname is None:
         local_fname = server_fname
-    full_path = os.path.join(DATASETS_DIR, local_fname)
-    if not os.path.exists(DATASETS_DIR):
-        os.makedirs(DATASETS_DIR)
-
+    full_path = local_fname
     meta = u.info()
     with open(full_path, 'wb') as f:
         file_size = int(meta.get("Content-Length")[0])

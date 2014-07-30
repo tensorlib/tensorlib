@@ -1,7 +1,7 @@
 import numpy as np
 from tensorlib.utils import check_random_state
 from tensorlib.utils import check_tensor
-from tensorlib.utils import downloader
+from tensorlib.utils import download
 from nose.tools import assert_raises
 from nose.plugins.skip import SkipTest
 
@@ -22,5 +22,5 @@ def test_random_state():
 
 def test_downloader():
     raise SkipTest
-    downloader("https://dl.dropboxusercontent.com/u/15378192/Sensory_Bread.zip",
-               "Sensory_Bread.zip")
+    download("https://dl.dropboxusercontent.com/u/15378192/Sensory_Bread.zip",
+             "Sensory_Bread.zip")

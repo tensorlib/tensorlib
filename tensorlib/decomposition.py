@@ -7,7 +7,7 @@ from .utils import check_random_state, check_tensor
 
 
 def _cp3(X, n_components, tol, max_iter, random_state=None):
-    """3 dimensional CANDECOMP/PARFAC decomposition."""
+    """3 dimensional CANDECOMP/PARAFAC decomposition."""
     if len(X.shape) != 3:
         raise ValueError("CP3 decomposition only supports 3 dimensions!")
 
@@ -49,7 +49,7 @@ def _cp3(X, n_components, tol, max_iter, random_state=None):
 
 
 def _cpN(X, n_components, tol, max_iter, random_state=None):
-    """Generalized CANDECOMP/PARFAC decomposition."""
+    """Generalized CANDECOMP/PARAFAC decomposition."""
 
     rs = check_random_state(random_state)
     components = [rs.randn(X.shape[i], n_components)
@@ -101,7 +101,6 @@ def cp(X, n_components=None, tol=1E-6, max_iter=1000, random_state=None,
 
     if force_general:
         return _cpN(X, n_components, tol, max_iter, random_state)
-
     elif len(X.shape) == 3:
         return _cp3(X, n_components, tol, max_iter, random_state)
     else:

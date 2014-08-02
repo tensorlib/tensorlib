@@ -49,15 +49,6 @@ def _canonical_kr(B, C):
     return A
 
 
-def _npdot_kr(B, C):
-    """A KR product using np.dot"""
-    n, p = B.shape
-    m, pC = C.shape
-
-    AT = B.T[:, :, np.newaxis].dot(C.T[:, np.newaxis, :]).reshape(p, -1)
-    return AT.T
-
-
 def matricize(X, axis):
     """
     Returns flattened version of tensor.

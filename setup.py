@@ -11,7 +11,7 @@ setuptools.setup(
     long_description=open(os.path.join(os.path.dirname(
         os.path.abspath(__file__)), 'README.rst')).read(),
     license='BSD 3-clause',
-    url='http://github.com/kastnerkyle/tensorlib/',
+    url='http://github.com/tensorlib/tensorlib/',
     install_requires=['numpy',
                       'scipy',],
     classifiers=['Development Status :: 3 - Alpha',

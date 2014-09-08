@@ -1,11 +1,11 @@
 """An example of using tensorlib and scipy to decompose a builtin dataset."""
-from tensorlib.datasets import fetch_bread
+from tensorlib.datasets import load_bread
 from tensorlib.decomposition import cp
 from scipy import linalg
 import numpy as np
 import matplotlib.pyplot as plt
 
-X, meta = fetch_bread()
+X, meta = load_bread()
 U0, U1, U2 = cp(X, n_components=2, random_state=1999)
 X0_flat = X.reshape(X.shape[0], -1)
 U, S, V = linalg.svd(X0_flat, full_matrices=False)

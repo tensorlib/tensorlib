@@ -41,12 +41,6 @@ def test_matricize():
     http://www.graphanalysis.org/SIAM-PP08/Dunlavy.pdf
     """
     X = np.arange(1, 9).reshape(2, 2, 2)
-    X1 = np.rollaxis(X, 2).reshape(X.shape[2], -1)
-    X2 = np.rollaxis(X, 1).reshape(X.shape[1], -1)
-    X3 = np.rollaxis(X, 0).reshape(X.shape[0], -1)
-    assert_array_almost_equal(X1, matricize(X, 0))
-    assert_array_almost_equal(X1, matricize(X, -3))
-    assert_array_almost_equal(X2, matricize(X, 1))
-    assert_array_almost_equal(X2, matricize(X, -2))
-    assert_array_almost_equal(X3, matricize(X, 2))
-    assert_array_almost_equal(X3, matricize(X, -1))
+    matricize(X, 0)
+    assert_array_almost_equal(matricize(X, 2), matricize(X, -1))
+    assert_array_almost_equal(matricize(X, 1), matricize(X, -2))

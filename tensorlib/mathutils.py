@@ -59,7 +59,6 @@ def matricize(X, axis):
     ----------
     X : ndarray, shape = [d1, ..., dn]
 
-
     Returns
     -------
     X_flat : ndarray, shape = [d_axis, d1 * d2 * ... d_n]
@@ -80,7 +79,16 @@ def matricize(X, axis):
 
 def sign_flip(X):
     """
-    Flip the signs of X so that largest value is positive
+    Flip the signs of X so that largest absolute value is positive.
+
+    Parameters
+    ----------
+    X : array-like
+
+    Returns
+    -------
+    X_flipped : array-like
+
     """
     max_abs_cols = np.argmax(np.abs(X), axis=0)
     signs = np.sign(X[max_abs_cols, list(range(X.shape[1]))])

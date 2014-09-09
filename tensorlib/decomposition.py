@@ -125,6 +125,50 @@ def cp(X, n_components=None, tol=1E-4, max_iter=500, init_type="hosvd",
        random_state=None):
     """
     CANDECOMP/PARAFAC decomposition.
+
+    Parameters
+    ----------
+    X : ndarray
+        Input data to decompose
+
+    n_components : int
+        The number of components in the decomposition. Note that unlike PCA or
+        SVD, the decomposition of n_components + 1 DOES NOT contain
+        the basis from the decomposition of n_components.
+
+    tol : float, optional (default=1E-4)
+        Stopping tolerance for reconstruction error.
+
+    max_iter : int, optional (default=500)
+        Maximum number of iterations to perform before exiting.
+
+    init_type : string, optional (default="hosvd")
+        How to initialize the decomposition. Choices are "random" or "hosvd",
+        where "random" is initialized with uniform random values, and "hosvd" is
+        initialized by the high order SVD of the dataset.
+
+    random_state : int, None, or np.RandomState instance
+       Random seed information to use when ``init_type`` == "random"
+
+
+    Returns
+    -------
+    components : list, length = X.ndim
+        Basis functions for X, each of shape [X.shape[idx], n_components] where
+        idx is the index into ``components``.
+
+
+    References
+    ----------
+    Kolda, T. G. & Bader, B. W.
+        Tensor Decompositions and Applications. SIAM Rev. 51, 455–500 (2009).
+
+    J.M. Landsberg, Tensors: Geometry and Applications. American Mathematical
+        Society (2011).
+
+    G. Golub and C. Van Loan. Matrix Computations, Third Edition, Chapter 5,
+        Section 5.4.4, pp. 252-253.
+
     """
     if n_components is None:
         raise ValueError("n_components is a required argument!")

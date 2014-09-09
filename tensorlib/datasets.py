@@ -20,6 +20,13 @@ TENSORLIB_DATASETS_DIR = os.path.expanduser("~/tensorlib_data")
 def load_bread():
     """
     Load brod.mat dataset originally from http://www.models.life.ku.dk/datasets .
+
+    Returns
+    -------
+    X : ndarray, shape = [10, 11, 8]
+    meta : dict
+        Metadata about the dataset
+
     """
     module_path = os.path.join(os.path.dirname(__file__), "data")
     with open(os.path.join(module_path, "bread.txt")) as f:
@@ -35,8 +42,16 @@ def load_bread():
 def fetch_decmeg():
     """
     Get and load a subject (subject 4) from the DECMEG dataset.
+
     Currently, this data is housed on the public Dropbox of one of the authors,
     until a permanent solution to download from the main repository is found.
+
+    Returns
+    -------
+    X : ndarray, shape = [594, 306, 375]
+    meta : dict
+        Metadata about the dataset
+
     """
     subdir = "decmeg"
     data_fname = "train_subject04.mat"
@@ -56,8 +71,10 @@ def fetch_decmeg():
         z.extractall(path=full_path)
         os.remove(tmp_file)
 
+    descr = "axis 1: trials, axis 2: sensors, axis 3: time series samples"
     matfile = os.path.join(full_path, data_fname)
     d = loadmat(matfile)
     X = d['X']
     meta = {k: d[k] for k in d.keys() if k not in ['X']}
+    meta['DESC'] = descr
     return X, meta

@@ -31,7 +31,7 @@ def _cp3(X, n_components, tol, max_iter, init_type, random_state=None):
     """
     3 dimensional CANDECOMP/PARAFAC decomposition.
 
-    This code is meant to be a tutorial example... in general the _cpN code
+    This code is meant to be a tutorial/testing example... in general _cpN
     should be more compact and equivalent mathematically.
     """
 
@@ -49,9 +49,9 @@ def _cp3(X, n_components, tol, max_iter, init_type, random_state=None):
         err_old = err
         A = matricize(X, 0).dot(kr(C, B)).dot(linalg.pinv(grams[1] * grams[2]))
         if itr == 0:
-            normalization = np.sqrt((B ** 2).sum(axis=0))
+            normalization = np.sqrt((A ** 2).sum(axis=0))
         else:
-            normalization = B.max(axis=0)
+            normalization = A.max(axis=0)
             normalization[normalization < 1] = 1
         A /= normalization
         grams[0] = np.dot(A.T, A)

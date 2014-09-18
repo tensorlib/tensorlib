@@ -161,7 +161,7 @@ def cp(X, n_components=None, tol=1E-4, max_iter=500, init_type="hosvd",
     References
     ----------
     Kolda, T. G. & Bader, B. W.
-        Tensor Decompositions and Applications. SIAM Rev. 51, 455–500 (2009).
+        Tensor Decompositions and Applications. SIAM Rev. 51, 455-500 (2009).
 
     J.M. Landsberg, Tensors: Geometry and Applications. American Mathematical
         Society (2011).

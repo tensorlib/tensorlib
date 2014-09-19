@@ -11,7 +11,7 @@ Important Links
 Setup
 =====
 
-The HTML docmentation linked above has a variety of resources for installation
+The HTML documentation linked above has a variety of resources for installation
 and example use. To get started immediately, clone this repo then do:
 
 ``python setup.py develop``

@@ -2,7 +2,7 @@
 import os
 import zipfile
 from scipy.io import loadmat
-from .utils import download
+from ..utils import download
 
 TENSORLIB_DATASETS_DIR = os.path.expanduser("~/tensorlib_data")
 

@@ -2,8 +2,8 @@
 import numpy as np
 from scipy import linalg
 from functools import reduce
-from .mathutils import kr, matricize, sign_flip
-from .utils import check_random_state, check_tensor
+from ..mathutils import kr, matricize, sign_flip
+from ..utils import check_random_state, check_tensor
 
 
 def _random_init(X, n_components, random_state=None):

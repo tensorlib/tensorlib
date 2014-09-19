@@ -1,4 +1,15 @@
-"""An example of using tensorlib and scipy to decompose a builtin dataset."""
+"""
+===================================
+Comparing SVD and CANDECOMP/PARAFAC
+===================================
+
+SVD decomposition can be used to decompose a tensor, but removing the structural
+information involved with having multiple axes changes the decomposition.
+
+The tensor decomposition retains structural information that is otherwise lost.
+
+"""
+print(__doc__)
 from tensorlib.datasets import load_bread
 from tensorlib.decomposition import cp
 from scipy import linalg

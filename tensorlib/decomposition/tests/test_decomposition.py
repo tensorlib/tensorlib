@@ -1,6 +1,6 @@
 import numpy as np
 from tensorlib.decomposition import cp
-from tensorlib.decomposition import _cp3
+from tensorlib.decomposition.decomposition import _cp3
 from tensorlib.datasets import load_bread
 from numpy.testing import assert_almost_equal
 from nose.tools import assert_raises

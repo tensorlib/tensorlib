@@ -1,7 +1,7 @@
 # Github pages ignore anything starting with an _
 # Lovely
 pushd . 
-cd _build/html/dev
+cd _build/html/
 #for folder in static downloads images sources; do
 for folder in static downloads images sources; do
     mv _$folder $folder

@@ -124,7 +124,8 @@ def _cpN(X, n_components, tol, max_iter, init_type, random_state=None):
 def cp(X, n_components=None, tol=1E-4, max_iter=500, init_type="hosvd",
        random_state=None):
     """
-    CANDECOMP/PARAFAC decomposition.
+    CANDECOMP/PARAFAC decomposition using an alternating least squares
+    algorithm.
 
     Parameters
     ----------

@@ -58,6 +58,7 @@ def matricize(X, axis):
     Parameters
     ----------
     X : ndarray, shape = [d1, ..., dn]
+    axis : int
 
     Returns
     -------
@@ -77,6 +78,33 @@ def matricize(X, axis):
     return X.transpose(axis, *not_axis).reshape(X.shape[axis], -1)
 
 
+def unmatricize(X, axis, dims):
+    """
+    Returns reshaped tensor, reverses matricize operation.
+    See http://www.graphanalysis.org/SIAM-PP08/Dunlavy.pdf
+    for more details.
+
+    Parameters
+    ----------
+    X : ndarray, shape = [d_axis, d1 * d2 * ... dn]
+    axis : int
+    dims : list, [d1, d2, ..., dn]
+
+    Returns
+    -------
+    X_tensor : ndarray, shape = [d1, d2, ..., d_n]
+
+    """
+    # If negative axis is passed, convert to equivalent positive form
+    if axis < 0:
+        axis = len(dims) + axis
+    not_axis = np.where(np.arange(len(dims)) != axis)[0][::-1]
+    d = np.array(dims)
+    perm = list(range(1, len(dims)))[::-1]
+    perm.insert(axis, 0)
+    return X.ravel().reshape(d[axis], *d[not_axis]).transpose(*perm)
+
+
 def sign_flip(X):
     """
     Flip the signs of X so that largest absolute value is positive.
@@ -93,3 +121,26 @@ def sign_flip(X):
     max_abs_cols = np.argmax(np.abs(X), axis=0)
     signs = np.sign(X[max_abs_cols, list(range(X.shape[1]))])
     return signs * X
+
+
+def tmult(X, M, axis):
+    """
+    Tensor multiplication (also known as n-mode multiplication)
+    Given an array X of shape (n, m, p) and a matrix M of shape (r, m)
+    multiplying along the 2nd dimension (axis 1) will result in a new tensor
+    of shape (n, r, p).
+
+    Parameters
+    ----------
+    X : array-like
+    M : array-like
+    axis : int
+
+    Returns
+    -------
+    T : ndarray
+
+    """
+    tensor_shape = list(X.shape)
+    tensor_shape[axis] = M.shape[0]
+    return unmatricize(M.dot(matricize(X, axis)), axis, tensor_shape)

@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import linalg
 from functools import reduce
-from ..mathutils import kr, matricize, sign_flip
+from ..mathutils import kr, matricize, sign_flip, tmult
 from ..utils import check_random_state, check_tensor
 
 
@@ -76,7 +76,7 @@ def _cp3(X, n_components, tol, max_iter, init_type, random_state=None):
 
         err = linalg.norm(matricize(X, 0) - np.dot(A, kr(C, B).T)) ** 2
         thresh = np.abs(err - err_old) / err_old
-        if (thresh < tol) or (itr > max_iter):
+        if thresh < tol:
             break
 
     return A, B, C
@@ -116,7 +116,7 @@ def _cpN(X, n_components, tol, max_iter, init_type, random_state=None):
             components[0], reduce(kr, components[1:-1][::-1],
                                   components[-1]).T)) ** 2
         thresh = np.abs(err - err_old) / err_old
-        if (thresh < tol) or (itr > max_iter):
+        if thresh < tol:
             break
     return components
 
@@ -177,3 +177,133 @@ def cp(X, n_components=None, tol=1E-4, max_iter=500, init_type="hosvd",
     check_tensor(X)
     return _cpN(X, n_components, tol=tol, max_iter=max_iter,
                 init_type=init_type, random_state=random_state)
+
+
+def _tucker3(X, n_components, tol, max_iter, init_type, random_state=None):
+    """
+    3 dimensional Tucker decomposition.
+
+    This code is meant to be a tutorial/testing example... in general _tuckerN
+    should be more compact and equivalent mathematically.
+    """
+
+    if len(X.shape) != 3:
+        raise ValueError("Tucker3 decomposition only supports 3 dimensions!")
+
+    if init_type == "random":
+        A, B, C = _random_init(X, n_components, random_state)
+    elif init_type == "hosvd":
+        A, B, C = _hosvd_init(X, n_components)
+    err = 1E10
+    X_sq = np.sum(X ** 2)
+
+    for itr in range(max_iter):
+        err_old = err
+        U, S, V = linalg.svd(matricize(X, 0).dot(np.kron(C, B)),
+                             full_matrices=False)
+        A = U[:, :n_components]
+        U, S, V = linalg.svd(matricize(X, 1).dot(np.kron(C, A)),
+                             full_matrices=False)
+        B = U[:, :n_components]
+        U, S, V = linalg.svd(matricize(X, 2).dot(np.kron(B, A)),
+                             full_matrices=False)
+        C = U[:, :n_components]
+        G = tmult(tmult(tmult(X, A.T, 0), B.T, 1), C.T, 2)
+        err = np.sum(G ** 2) - X_sq
+        thresh = np.abs(err - err_old) / err_old
+        if thresh < tol:
+            break
+    return G, A, B, C
+
+
+def _tuckerN(X, n_components, tol, max_iter, init_type, random_state=None):
+    """Generalized Tucker decomposition."""
+    if init_type == "random":
+        components = _random_init(X, n_components, random_state)
+    elif init_type == "hosvd":
+        components = _hosvd_init(X, n_components)
+    err = 1E10
+    X_sq = np.sum(X ** 2)
+
+    def mod_tmult(arg0, arg1):
+        return tmult(arg0, arg1[0], arg1[1])
+
+    for itr in range(max_iter):
+        err_old = err
+
+        for idx in range(len(components)):
+            components_sublist = [components[n] for n in range(len(components))
+                                  if n != idx]
+            p1 = reduce(np.kron, components_sublist[:-1][::-1],
+                        components_sublist[-1])
+            U, S, V = linalg.svd(matricize(X, idx).dot(p1), full_matrices=False)
+            components[idx] = U[:, :n_components]
+
+        mod_components = [(c.T, idx) for idx, c in enumerate(components)]
+        G = reduce(mod_tmult, mod_components[1:], tmult(X, *mod_components[0]))
+        err = np.sum(G ** 2) - X_sq
+        thresh = np.abs(err - err_old) / err_old
+        if thresh < tol:
+            break
+    ret = [G]
+    ret.extend(components)
+    return ret
+
+
+def tucker(X, n_components=None, tol=1E-6, max_iter=500, init_type="hosvd",
+           random_state=None):
+    """
+    Tucker decomposition using an alternating least squares
+    algorithm.
+
+    Parameters
+    ----------
+    X : ndarray
+        Input data to decompose
+
+    n_components : int
+        The number of components in the decomposition. Note that unlike PCA or
+        SVD, the decomposition of n_components + 1 DOES NOT contain
+        the basis from the decomposition of n_components.
+
+    tol : float, optional (default=1E-4)
+        Stopping tolerance for reconstruction error.
+
+    max_iter : int, optional (default=500)
+        Maximum number of iterations to perform before exiting.
+
+    init_type : string, optional (default="hosvd")
+        How to initialize the decomposition. Choices are "random" or "hosvd",
+        where "random" is initialized with uniform random values, and "hosvd" is
+        initialized by the high order SVD of the dataset.
+
+    random_state : int, None, or np.RandomState instance
+       Random seed information to use when ``init_type`` == "random"
+
+
+    Returns
+    -------
+    components : list, length = X.ndim
+        Basis functions for X, each of shape [X.shape[idx], n_components] where
+        idx is the index into ``components``. First component is a multiplier G,
+        followed by components for each mode.
+
+
+    References
+    ----------
+    Kolda, T. G. & Bader, B. W.
+        Tensor Decompositions and Applications. SIAM Rev. 51, 455-500 (2009).
+
+    J.M. Landsberg, Tensors: Geometry and Applications. American Mathematical
+        Society (2011).
+
+    G. Golub and C. Van Loan. Matrix Computations, Third Edition, Chapter 5,
+        Section 5.4.4, pp. 252-253.
+
+    """
+    if n_components is None:
+        raise ValueError("n_components is a required argument!")
+
+    check_tensor(X)
+    return _tuckerN(X, n_components, tol=tol, max_iter=max_iter,
+                    init_type=init_type, random_state=random_state)

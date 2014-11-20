@@ -39,6 +39,33 @@ def load_bread():
     return X, meta
 
 
+def load_claus():
+    """
+    Load claus.mat dataset originally from
+    http://www.imm.dtu.dk/~mm/downloads/CPandTucker.zip
+
+    This dataset contains flouresence information of chemicals, gathered by
+    Claus A. Anderson as part of an investigation.
+
+    Data contains varying amounts of tyrosine, tryptophane and phenylalanine.
+
+    Returns
+    -------
+    X : ndarray, shape = [5, 201, 61]
+    meta : dict
+        Metadata about the dataset
+
+    """
+    module_path = os.path.join(os.path.dirname(__file__), "data")
+    descr = "axis 1: samples, axes 2 & 3: emission-excitation spectra"
+    matfile = os.path.join(module_path, "claus.mat")
+    d = loadmat(matfile)
+    X = d['X']
+    meta = {k: d[k] for k in d.keys() if k not in ['X']}
+    meta['DESC'] = descr
+    return X, meta
+
+
 def fetch_decmeg():
     """
     Get and load a subject (subject 4) from the DECMEG dataset.

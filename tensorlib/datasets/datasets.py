@@ -33,7 +33,7 @@ def load_bread():
         descr = f.read()
     matfile = os.path.join(module_path, "brod.mat")
     d = loadmat(matfile)
-    X = d['X'].reshape(d['DimX'].ravel())
+    X = d['X'].reshape(d['DimX'].ravel().astype(int))
     meta = {k: d[k] for k in d.keys() if k not in ['X', 'DimX']}
     meta['DESC'] = descr
     return X, meta

@@ -13,10 +13,12 @@ setuptools.setup(
     license='BSD 3-clause',
     url='http://github.com/tensorlib/tensorlib/',
     install_requires=['numpy',
-                      'scipy',],
+                      'scipy'],
     classifiers=['Development Status :: 3 - Alpha',
                  'Intended Audience :: Science/Research',
                  'License :: OSI Approved :: BSD License',
                  'Operating System :: OS Independent',
                  'Topic :: Scientific/Engineering'],
+    package_data={'tensorlib': [os.path.join('datasets', 'data', '*.txt'),
+                                os.path.join('datasets', 'data', '*.mat')]}
 )
